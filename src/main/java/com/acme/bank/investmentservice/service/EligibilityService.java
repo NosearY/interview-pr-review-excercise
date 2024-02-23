@@ -30,10 +30,10 @@ public class EligibilityService {
     }
 
     private void validateOrThrow(UserProfile userProfile) {
-        require(() -> userProfile != null, "UserProfile must not null");
-        require(() -> userProfile.getUserPersonalInformation() != null, "UserPersonalInformation must not null");
-        require(() -> userProfile.getUserPersonalInformation().getAge() > 0, "UserPersonalInformation.age be larger than 0");
-        require(() -> userProfile.getUserIncomeInformation() != null, "UserIncomeInformation must not null");
+        require(() -> userProfile != null, "UserProfile must not be null");
+        require(() -> userProfile.getUserPersonalInformation() != null, "UserPersonalInformation must not be null");
+        require(() -> userProfile.getUserPersonalInformation().getAge() > 0, "UserPersonalInformation.age musts be larger than 0");
+        require(() -> userProfile.getUserIncomeInformation() != null, "UserIncomeInformation must not be null");
     }
 
     private boolean userIsElderlyAndWithSufficientDepositBalance(UserProfile userProfile) {
