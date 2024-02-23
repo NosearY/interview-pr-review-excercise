@@ -1,47 +1,52 @@
 package com.acme.bank.investmentservice.service;
 
 import com.acme.bank.investmentservice.domain.UserProfile;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 @Service
 public class EligibilityService {
 
-    @Autowired
-    private UserProfileService userProfileService;
+    public EligibilityService(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
+    }
 
-    // UserProfile retrieval is an intensive call, hence we want to cache the operation
-    // No need to consider cache invalidation for simplicity
-    private HashMap<String, UserProfile> cache;
+    private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_ELDERLY = 1_000_000f;
+    private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_OTHERS = 500_000f;
+    private final UserProfileService userProfileService;
+
+    private final ConcurrentHashMap<String, UserProfile> userProfileCache = new ConcurrentHashMap<>();
 
     public boolean checkInvestmentEligibility(String userId) {
-        UserProfile up = null;
-        if (cache.get(userId) == null) {
-            up = userProfileService.findByUserId(userId);
-            cache.put(userId, up);
-        } else {
-            up = cache.get(userId);
-        }
+        UserProfile userProfile = userProfileCache.computeIfAbsent(userId, userProfileService::findByUserId);
+        validateOrThrow(userProfile);
 
-        // checking whether user has sufficient deposit balance with respect to his/her age
-        // Age >= 65, deposit balance must be >= 1 million
-        // Age <= 65, deposit balance must be >= 0.5 million
-        try {
-            if (up.getUserPersonalInformation().getAge() > 65 && up.getUserIncomeInformation().getDepositBalanceInUSD() >= 1_000_000f) {
-                return true;
-            } else if (up.getUserPersonalInformation().getAge() <= 65) {
-                if (up.getUserIncomeInformation().getDepositBalanceInUSD() >= 500_000f) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                throw new IllegalArgumentException("Invalid user profile");
-            }
-        } catch (Exception e) {
-            return false;
+        return userIsElderlyAndWithSufficientDepositBalance(userProfile) ||
+                userIsNotElderAndWithSufficientDepositBalance(userProfile);
+    }
+
+    private void validateOrThrow(UserProfile userProfile) {
+        require(() -> userProfile != null, "UserProfile must not null");
+        require(() -> userProfile.getUserPersonalInformation() != null, "UserPersonalInformation must not null");
+        require(() -> userProfile.getUserPersonalInformation().getAge() > 0, "UserPersonalInformation.age be larger than 0");
+        require(() -> userProfile.getUserIncomeInformation() != null, "UserIncomeInformation must not null");
+    }
+
+    private boolean userIsElderlyAndWithSufficientDepositBalance(UserProfile userProfile) {
+        return userProfile.getUserPersonalInformation().getAge() > 65 &&
+                userProfile.getUserIncomeInformation().getDepositBalanceInUSD() >= DEPOSIT_BALANCE_REQUIREMENT_FOR_ELDERLY;
+    }
+
+    private boolean userIsNotElderAndWithSufficientDepositBalance(UserProfile userProfile) {
+        return userProfile.getUserPersonalInformation().getAge() <= 65 &&
+                userProfile.getUserIncomeInformation().getDepositBalanceInUSD() >= DEPOSIT_BALANCE_REQUIREMENT_FOR_OTHERS;
+    }
+
+    private void require(Supplier<Boolean> predicate, String failureReason) {
+        if (!predicate.get()) {
+            throw new IllegalArgumentException(failureReason);
         }
     }
 }
