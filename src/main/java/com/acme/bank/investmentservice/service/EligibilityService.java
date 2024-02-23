@@ -13,6 +13,8 @@ public class EligibilityService {
         this.userProfileService = userProfileService;
     }
 
+    private static final int AGE_TO_CONSIDER_ELDERLY = 65;
+
     private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_ELDERLY = 1_000_000f;
     private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_OTHERS = 500_000f;
     private final UserProfileService userProfileService;
@@ -35,7 +37,7 @@ public class EligibilityService {
     }
 
     private boolean userIsElderlyAndWithSufficientDepositBalance(UserProfile userProfile) {
-        return userProfile.getUserPersonalInformation().getAge() > 65 &&
+        return userProfile.getUserPersonalInformation().getAge() > AGE_TO_CONSIDER_ELDERLY &&
                 userProfile.getUserIncomeInformation().getDepositBalanceInUSD() >= DEPOSIT_BALANCE_REQUIREMENT_FOR_ELDERLY;
     }
 
