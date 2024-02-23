@@ -9,16 +9,15 @@ import java.util.function.Supplier;
 @Service
 public class EligibilityService {
 
+    private static final int AGE_TO_CONSIDER_ELDERLY = 65;
+    private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_ELDERLY = 1_000_000f;
+    private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_OTHERS = 500_000f;
+
     public EligibilityService(UserProfileService userProfileService) {
         this.userProfileService = userProfileService;
     }
 
-    private static final int AGE_TO_CONSIDER_ELDERLY = 65;
-
-    private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_ELDERLY = 1_000_000f;
-    private static final float DEPOSIT_BALANCE_REQUIREMENT_FOR_OTHERS = 500_000f;
     private final UserProfileService userProfileService;
-
     private final ConcurrentHashMap<String, UserProfile> userProfileCache = new ConcurrentHashMap<>();
 
     public boolean checkInvestmentEligibility(String userId) {
