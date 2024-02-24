@@ -14,6 +14,6 @@ public class EligibilityCheckController {
 
     @GetMapping("/eligibility")
     public ResponseEntity<Boolean> checkInvestmentEligibility(String userId) {
-        return ResponseEntity.ok(eligibilityService.checkInvestmentEligibility(userId));
+        return ResponseEntity.ok(eligibilityService.check(userId));
     }
 }

@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
-@Service
-/*
-    Assumptions:
-    - The code compiles
-    - Ignore cache invalidation invalidation issue
+/**
+ * Assumptions:
+ * - The code compiles
+ * - Ignore cache invalidation issue
  */
+@Service
 public class EligibilityService {
 
     @Autowired
@@ -22,23 +22,24 @@ public class EligibilityService {
     /**
      * Fetch UserProfile by userId in cache
      * If not found, fetch it from database
-     * Calculate its eligibility for investments
+     * Calculate its eligibility for offering investments services
+     *
      * @param userId
      * @return true if the user is eligible for investments, false otherwise
      */
-    public boolean checkInvestmentEligibility(String userId) {
-        UserProfile temp = null;
-        for (UserProfile up : cache) {
-            if (up.getUserId() == userId) {
-                temp = up;
-            }
-        }
-        if (temp == null) {
-            temp = userProfileService.findByUserId(userId);
-            cache.add(temp);
-        }
-
+    public boolean check(String userId) {
         try {
+            UserProfile temp = null;
+            for (UserProfile up : cache) {
+                if (up.getUserId() == userId) {
+                    temp = up;
+                }
+            }
+            if (temp == null) {
+                temp = userProfileService.findByUserId(userId);
+                cache.add(temp);
+            }
+
             if (temp.getUserPersonalInformation().getAge() > 65 && temp.getUserIncomeInformation().getDepositBalanceInUSD() >= 1_000_000f) {
                 return true;
             } else if (temp.getUserPersonalInformation().getAge() <= 65) {
