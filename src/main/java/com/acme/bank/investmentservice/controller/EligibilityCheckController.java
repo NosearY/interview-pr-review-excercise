@@ -1,4 +1,4 @@
-package com.acme.bank.investmentservice.coontroller;
+package com.acme.bank.investmentservice.controller;
 
 import com.acme.bank.investmentservice.service.EligibilityService;
 import org.springframework.beans.factory.annotation.Autowired;
