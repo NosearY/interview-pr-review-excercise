@@ -2,8 +2,17 @@ package com.acme.bank.investmentservice.domain;
 
 public class UserProfile {
 
+    private String userId;
     private UserIncomeInformation userIncomeInformation;
     private UserPersonalInformation userPersonalInformation;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public UserPersonalInformation getUserPersonalInformation() {
         return userPersonalInformation;
