@@ -5,9 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 @Service
+/*
+    Assumptions:
+    - The code compiles
+    - Ignore cache invalidation invalidation issue
+ */
 public class EligibilityService {
 
     @Autowired
